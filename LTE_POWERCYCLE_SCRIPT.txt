@@ -1,0 +1,135 @@
+
+
+# BOARD THAT IS TESTED #1
+{
+ :delay 5s;
+ :local message; 
+ :local isup false;
+ 
+ :if (:len [/file print where name=lte.rsc]>0) do={
+    /file remove lte.rsc;
+          }
+     /interface lte export file=lte.rsc;
+       :if ([:len [/interface lte find]]>0) do={
+        :set $isup (true);
+         }
+
+         :delay 2s;
+         :set $message [(":set \$lteup ".$isup.";")];
+          /file set lte.rsc contents="$message";
+
+        /tool fetch upload=yes address=10.21.17.4 mode=ftp password=""\
+            user="admin" src-path=lte.rsc dst-path=lte.rsc port=21;
+       }
+
+	   
+	   
+	   
+	   
+	   # BOARD THAT IS TESTED #2
+{
+:delay 5s;
+ :local message; 
+ :local isup false;
+ 
+ :if (:len [/file print where name=lte2.rsc]>0) do={
+    /file remove lte2.rsc;
+          }
+     /interface lte export file=lte2.rsc;
+       :if ([:len [/interface lte find]]>0) do={
+        :set $isup (true);
+         }
+
+         :delay 2s;
+         :set $message [(":set \$lteup2 ".$isup.";")];
+          /file set lte2.rsc contents="$message";
+
+        /tool fetch upload=yes address=10.21.17.4 mode=ftp password=""\
+            user="admin" src-path=lte2.rsc dst-path=lte2.rsc port=21;
+       }
+
+
+
+	   
+	 put "there have been $errorCheck lte errors ";
+:put [/system clock get time];
+:set $exitMessage [("NO LTE RESPONSE: TIME "[/system clock get time]"on cycle "$i)];
+/file set logg.txt contents="$exitMessage";
+
+	   
+	   
+	   
+	   
+	   
+	   
+ # BOARD THAT TESTS
+ 
+ {
+    :global lteup true;
+    :local i 0;
+    :global lteup2 true;
+    :local currentDelay;
+    :local errorCheck;    
+    :local exitMessage;
+    :local exitTime;
+	:local logg;
+ :do {        
+:while ([$lteup true] && [$lteup2 true]) do={
+
+:set currentDelay [:pick [/system clock get time] 7];
+/interface ethernet set ether5 poe-out=off
+/interface ethernet set ether4 poe-out=off
+:put "powercycling for $currentDelay seconds"
+:delay ($currentDelay);
+/interface ethernet set ether5 poe-out=forced-on
+/interface ethernet set ether4 poe-out=forced-on
+
+    :while ([ping address=10.21.17.5 count=1]=0 && [ping address=10.21.17.6 count=1]=0 ) do={:delay 200ms;}
+            
+:delay 10s;
+
+/import file-name=lte2.rsc;
+:delay 2s;
+/import file-name=lte.rsc;
+:delay 2s;
+
+    /file remove lte.rsc;
+    /file remove lte2.rsc;
+    :set $i [($i+1)];
+ 
+    :put "loop has executed $i times"; 
+
+                 } } on-error={[:set $errorCheck [($errorCheck +1)]]};
+:put "there have been $errorCheck lte errors ";
+:put [/system clock get time];
+:set $logg [([/file get logg.txt contents])];
+:set $exitTime [([/system clock get time])];
+:set $exitMessage [(("$logg\n\n  NO LTE RESPONSE:\nTIME $exitTime\non cycle $i"))];
+/file set logg.txt contents="$exitMessage";
+
+/system script run lteexp 
+}
+
+
+
+// GET STEND IP
+
+:put [/ip neighbor get [/ip neighbor find where identity~"t24h"] address ]    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

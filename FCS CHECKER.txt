@@ -1,0 +1,134 @@
+{
+        :local eth "ether1";
+        :local count 1; 
+        :local sfp "sfp1";
+        :local sfpCount 1;
+       
+        :do {
+                                                                       
+            :while ($count <=20  ) do={
+       
+        :delay 0.200s;          
+        
+                              
+                            
+                :if ([/interface ethernet get value-name=rx-fcs-error number=$eth] >0 \
+                || [/interface ethernet get value-name=rx-fcs-error number=$eth] >0 ) do={
+       
+        :put "           !!!!! fcs errors detected on $eth !!!!!";
+                        } else={
+        :put "no fcs errors detected on $eth";
+                        } 
+                                  
+        :set $count [($count +1)];
+        :set $eth [("ether".($count))];
+                        }
+                        } on-error={};
+                                                                   
+        :do {
+       
+            :while ($count <= 20 ) do={
+                                                                                                                   
+                :if ([/interface ethernet get value-name=rx-fcs-error number=$sfp] >0 \
+                || [/interface ethernet get value-name=rx-fcs-error number=$sfp] >0 ) do={
+        :put "           !!!!! fcs errors detected on $sfp  !!!!!";
+                        } else={
+       
+        :put "no fcs errors detected on $sfp";
+                        }
+        :set $count [($count +1)];
+        :set $sfpCount [($sfpCount +1)];
+        :set $sfp [("sfp".($sfpCount))]                                                                                 
+             }
+                        } on-error={};
+                                                                                                                        
+                             
+                                                                                                                        
+                             
+        :put "script over";     
+                        }
+
+
+
+
+
+						
+       
+		
+
+{
+        :local eth "ether1";
+        :local count 1; 
+        :local sfp "sfp1";
+        :local sfpCount 1;
+		:local sfpPlusCount 1;
+		:local sfpPlus "sfp-sfpplus1";
+       
+        :do {
+                                                                       
+            :while ($count <=30  ) do={
+       
+        :delay 0.200s;          
+        
+                              
+                            
+                :if ([/interface ethernet get value-name=rx-fcs-error number=$eth] >0 \
+                || [/interface ethernet get value-name=rx-fcs-error number=$eth] >0 ) do={
+       
+        :put "           !!!!! fcs errors detected on $eth !!!!!";
+                        } else={
+        :put "no fcs errors detected on $eth";
+                        } 
+                                  
+        :set $count [($count +1)];
+        :set $eth [("ether".($count))];
+                        }
+                        } on-error={};
+                                                                   
+        :do {
+       
+            :while ($count <= 30 ) do={
+                                                                                                                   
+                :if ([/interface ethernet get value-name=rx-fcs-error number=$sfp] >0 \
+                || [/interface ethernet get value-name=rx-fcs-error number=$sfp] >0 ) do={
+        :put "           !!!!! fcs errors detected on $sfp  !!!!!";
+                        } else={
+       
+        :put "no fcs errors detected on $sfp";
+                        }
+        :set $count [($count +1)];
+        :set $sfpCount [($sfpCount +1)];
+        :set $sfp [("sfp".($sfpCount))]                                                                                 
+             }
+                        } on-error={};
+						
+		:do {
+       
+            :while ($count <= 30 ) do={
+                                                                                                                   
+                :if ([/interface ethernet get value-name=rx-fcs-error number=$sfpPlus] >0 \
+                || [/interface ethernet get value-name=rx-fcs-error number=$sfpPlus] >0 ) do={
+        :put "           !!!!! fcs errors detected on $sfpPlus  !!!!!";
+                        } else={
+       
+        :put "no fcs errors detected on $sfpPlus";
+                        }
+        :set $count [($count +1)];
+        :set $sfpPlusCount [($sfpPlusCount +1)];
+        :set $sfpPlus [("sfp-sfpplus".($sfpPlusCount))]                                                                                 
+             }
+                        } on-error={};
+                                                                                                                        
+                             
+                                                                                                                        
+                             
+        :put "script over";     
+                        }      
+       
+
+
+	   
+	   
+	   
+	   
+	   

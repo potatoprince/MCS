@@ -1,0 +1,153 @@
+
+														WITH CHANGING POWERCYCLE DURATIONS
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+ # BOARD THAT TESTS #1
+ 
+ {
+    :global wlanup1 true;
+    :global wlanup2 true;
+	:global wlanup3 true;
+	:local i 0;
+    :local currentDelay;
+    :local errorCheck;    
+    :local exitMessage;
+    :local exitTime;
+	:local logg;
+ :do {        
+:while ([$wlanup1 true] && [$wlanup2 true] && [$wlanup3 true]) do={
+
+:set currentDelay [:pick [/system clock get time] 7];
+/interface ethernet set ether2 poe-out=off
+/interface ethernet set ether3 poe-out=off
+/interface ethernet set ether4 poe-out=off
+:put "powercycling for $currentDelay seconds"
+:delay ($currentDelay);
+/interface ethernet set ether2 poe-out=forced-on
+/interface ethernet set ether3 poe-out=forced-on
+/interface ethernet set ether4 poe-out=forced-on
+
+    :while ([ping address=172.22.113.22 count=1] =0 && [ping address=172.22.113.23 count=1]=0 && [ping addres=172.22.113.24  count=1]=0 ) do={:delay 200ms;}
+            
+:delay 10s;
+/import file-name=wlan1.rsc
+:delay 2s;
+/import file-name=wlan2.rsc;
+:delay 2s;
+/import file-name=wlan3.rsc;
+:delay 2s;
+
+    /file remove wlan1.rsc;
+    /file remove wlan2.rsc;
+    /file remove wlan3.rsc;
+    :set $i [($i+1)];
+ 
+    :put "loop has executed $i times"; 
+
+                 } } on-error={[:set $errorCheck [($errorCheck +1)]]};
+:put "there have been $errorCheck wlan errors ";
+:put [/system clock get time];
+:set $logg [([/file get flash/logg.txt contents])];
+:set $exitTime [([/system clock get time])];
+:set $exitMessage [(("$logg\n\n  WLAN RESPONSE:\nTIME $exitTime\non cycle $i"))];
+/file set logg.txt contents="$exitMessage";
+
+/system script run wlanup 
+}
+
+
+
+// GET STEND IP
+
+:put [/ip neighbor get [/ip neighbor find where identity~"t24h"] address ]    
+
+
+
+
+
+
+# BOARD THAT IS TESTED #1
+
+{
+ :delay 2s;
+ :local message; 
+ :local isup false;
+ 
+ :if ([:len [/file print where name=wlan1.rsc]]>0) do={
+    /file remove wlan1.rsc;
+          }
+     /interface w60g export file=wlan1.rsc;
+       :if ([:len [/interface w60g find]]>0) do={
+        :set $isup (true);
+         }
+
+         :delay 2s;
+         :set $message [(":set \$wlanup1 ".$isup.";")];
+          /file set wlan1.rsc contents="$message";
+
+        /tool fetch upload=yes address=172.22.113.21 mode=ftp password=""\
+            user="admin" src-path=wlan1.rsc dst-path=wlan1.rsc port=21;
+       }
+
+	   
+	   
+	   
+	   
+	   # BOARD THAT IS TESTED #2
+	   
+{
+:delay 2s;
+ :local message; 
+ :local isup false;
+ 
+ :if ([:len [/file print where name=wlan2.rsc]]>0) do={
+    /file remove wlan2.rsc;
+          }
+     /interface w60g export file=wlan2.rsc;
+       :if ([:len [/interface w60g find]]>0) do={
+        :set $isup (true);
+         }
+
+         :delay 2s;
+         :set $message [(":set \$wlanup2 ".$isup.";")];
+          /file set wlan2.rsc contents="$message";
+
+        /tool fetch upload=yes address=172.22.113.21 mode=ftp password=""\
+            user="admin" src-path=wlan2.rsc dst-path=wlan2.rsc port=21;
+       }
+
+
+	   # BOARD THAT IS TESTED #3
+	   
+{
+:delay 2s;
+ :local message; 
+ :local isup false;
+ 
+ :if ([:len [/file print where name=wlan3.rsc]]>0) do={
+    /file remove wlan3.rsc;
+          }
+     /interface w60g export file=wlan3.rsc;
+       :if ([:len [/interface w60g find]]>0) do={
+        :set $isup (true);
+         }
+
+         :delay 2s;
+         :set $message [(":set \$wlanup3 ".$isup.";")];
+          /file set wlan3.rsc contents="$message";
+
+        /tool fetch upload=yes address=172.22.113.21 mode=ftp password=""\
+            user="admin" src-path=wlan3.rsc dst-path=wlan3.rsc port=21;
+       }
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,5 @@
+This project contains a collection of various scripts used in Mikrotik router consoles.
+
+Scripts are self explanatory and in the event when there's more than 2 or 3 boards to test, just copy the scripts from previous # boards and increment the values by 1 etc.
+
+Also, the IP addresses used in ping check and fetch commands are my own local ones, so change them appropriately.
