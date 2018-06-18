@@ -3,3 +3,33 @@ This project contains a collection of various scripts used in Mikrotik router co
 Scripts are self explanatory and in the event when there's more than 2 or 3 boards to test, just copy the scripts from previous # boards and increment the values by 1 etc.
 
 Also, the IP addresses used in ping check and fetch commands are my own local ones, so change them appropriately.
+
+
+Add the scripts on your Mikrotik through Winbox -> New Terminal -> /system script add name="scriptName" source="{script source}"
+
+
+
+For example:
+
+/system script add name=wlanUP source="{
+ :delay 2s;
+ :local message; 
+ :local isup false;
+ 
+ :if ([:len [/file print where name=wlan1.rsc]]>0) do={
+    /file remove wlan1.rsc;
+          }
+     /interface w60g export file=wlan1.rsc;
+       :if ([:len [/interface w60g find]]>0) do={
+        :set $isup (true);
+         }
+
+         :delay 2s;
+         :set $message [(":set \$wlanup1 ".$isup.";")];
+          /file set wlan1.rsc contents="$message";
+
+        /tool fetch upload=yes address=172.22.113.21 mode=ftp password=""\
+            user="admin" src-path=wlan1.rsc dst-path=wlan1.rsc port=21;
+}
+
+"
