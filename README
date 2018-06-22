@@ -11,9 +11,7 @@ Add the scripts on your Mikrotik through Winbox -> New Terminal -> /system scrip
 
 For example:
 
-/system script add name=wlanUP source="
-
-{
+/system script add name=wlanUP source={
  :delay 2s;
  :local message; 
  :local isup false;
@@ -34,4 +32,9 @@ For example:
             user="admin" src-path=wlan1.rsc dst-path=wlan1.rsc port=21;
 }
 
-"
+
+
+Occasionally, this won't work and script wont be added. So, just make an empty script at first and then edit it in:
+
+/system script add name=wlanUP source=""
+/system script edit wlanUP value-name=source
